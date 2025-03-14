@@ -24,38 +24,31 @@
     <section aria-labelledby="top-rated-films-title">
         <h2 id="top-rated-films-title">Films les mieux notés</h2>
         <div id="film-container" class="film-container"></div>
-        <button class="see-more-btn" data-category="top-rated">Voir plus</button>
+
     </section>
 
     <!-- Catégorie 1 -->
     <section aria-labelledby="category-1-title">
-        <h2 id="category-1-title">Mystery</h2>
+        <h2 id="category-1-title">Animation</h2>
         <div id="category-1-content" class="film-container"></div>
         <button class="see-more-btn" data-category="category-1">Voir plus</button>
     </section>
 
     <!-- Catégorie 2 -->
     <section aria-labelledby="category-2-title">
-        <h2 id="category-2-title">Catégorie 2</h2>
+        <h2 id="category-2-title">Westerns</h2>
         <div id="category-2-content" class="film-container"></div>
         <button class="see-more-btn" data-category="category-2">Voir plus</button>
     </section>
 
-    <!-- Autres catégories -->
-    <section aria-labelledby="other-category-title">
-        <h2 id="other-category-title">Autres</h2>
-        <select id="category-select">
-            <option value="action">Films d'action</option>
-            <option value="comedy">Comédies</option>
-            <option value="family">Famille</option>
-            <option value="fantasy">Films fantastiques</option>
-            <option value="horror">Films d'horreur</option>
-            <option value="science-fiction">Science-fiction</option>
-            <option value="westerns">Westerns</option>
-        </select>
-        <div id="other-category-content" class="film-container"></div>
-        <button class="see-more-btn" data-category="other">Voir plus</button>
-    </section>
+    <section id="categories">
+    <h2>Films par Catégorie</h2>
+    <label for="category-select">Autres :</label>
+    <select id="category-select">
+        <option value="">-- Sélectionner une catégorie --</option>
+    </select>
+    <div id="selected-category-container"></div>
+</section>
 </main>
 
 <!-- Modal pour afficher les détails du film -->
