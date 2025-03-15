@@ -1,0 +1,173 @@
+header {
+    background-color: #61787F;
+    color: white;
+    display: flex;
+    justify-content: center; /* Centrer horizontalement le contenu */
+}
+
+.logo{
+    width: 150px;
+    height: auto;
+}
+
+ /* Hopeful Notes */
+#featured-film-content {
+    align-items: center;
+    background: white;
+    padding: 15px;
+    border-radius: 0px;
+    border: 5px solid black;
+    max-width: 850px;
+    margin: auto;
+
+}
+.details-btn {
+    display: inline-block;
+    background-color: red;
+    color: white;
+    text-decoration: none;
+    border-radius: 30px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    align-self: end; /* Aligne le bouton à droite */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+}
+
+.featured-film {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Espacement entre l'image et le texte */
+}
+
+.featured-film img {
+    width: 150px;
+    height: auto;
+    border-radius: 0px;
+    flex-shrink: 0; /* Empêche l'image de rétrécir */
+}
+.film-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex: 1;
+}
+
+/*Films les mieux notés*/
+.film {
+    position: relative;
+    overflow: hidden;
+    background-color: #fff;
+    width: 252px; /* Largeur fixe */
+    height: 247px; /* Hauteur fixe */
+
+}
+
+.film .details-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    width: 80px;
+    height: 30px;
+    border: none;
+    border-radius: 25px;
+    background: #FA0B0B;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/*Films les mieux notés*/
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 50%;
+    border-radius: 8px;
+}
+
+/* Styles pour le bouton de fermeture du modal */
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+/* État de survol et de focus pour le bouton de fermeture */
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Style pour l'affichage de la boîte de dialogue */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+
+}
+
+/* Conteneur principal  de l'ensemble des films */
+.film-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 films par ligne */
+    gap: 20px; /* Espacement entre les films */
+    justify-content: center;
+    max-width: 100px;
+    margin: auto;
+}
+
+/* Dimension de chaque affiches films */
+.film img {
+    width: 242px ;
+    height: 247 ;
+}
+
+/* Responsive */
+@media only screen and (max-width:800px) {
+    .film-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    .film-container {
+        grid-template-columns: 1fr;
+    }
+    header {
+        flex-direction: column;
+    }
+    .featured-film {
+        flex-direction: column;
+    }
+}
+
+.see-more-btn {
+    display: block;
+    margin: 20px auto; /* Centrage horizontal */
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background-color: #FA0B0B;
+    color: white;
+}
+
+
