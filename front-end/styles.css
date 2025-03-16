@@ -171,6 +171,32 @@ header {
 }
 
 
+/* Centrer la section "Films par Catégorie" */
+#categories {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px; /* Ajustez l'espacement au-dessus de la section */
+    padding: 10px;
+    border: 1px solid #ccc; /* Optionnel : ajoute une bordure pour la visibilité */
+    border-radius: 5px; /* Optionnel : ajoute des coins arrondis */
+    background-color: #f9f9f9; /* Optionnel : ajoute un fond léger */
+}
+
+#categories h2 {
+    margin-bottom: 10px;
+}
+
+#categories label, #categories select {
+    margin-bottom: 10px;
+}
+
+#selected-category-container {
+    width: 100%;
+    max-width: 800px; /* Limite la largeur pour un meilleur affichage */
+}
+
+
 
 
 
