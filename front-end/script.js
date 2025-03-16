@@ -8,19 +8,15 @@ document.addEventListener("DOMContentLoaded", async function () {
             const response = await fetch(baseURL + "?sort_by=-imdb_score&page_size=1");
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
-
             if (data.results.length === 0) {
                 console.error("Aucun film trouvé !");
                 return;
             }
-
             const bestFilm = data.results[0];
-
             // 2. Récupérer les détails complets du meilleur film
             const detailsResponse = await fetch(baseURL + bestFilm.id);
             if (!detailsResponse.ok) throw new Error(`Erreur HTTP: ${detailsResponse.status}`);
             const filmDetails = await detailsResponse.json();
-
             // 3. Ajouter le film dans la section "Meilleur film"
             featuredContainer.innerHTML = `
                 <div class="featured-film">
@@ -38,10 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
 
     await fetchBestFilm();
-});
 
-document.addEventListener("DOMContentLoaded", async function () {
-    const baseURL = "http://localhost:8000/api/v1/titles/";
     const containers = {
         featured: document.getElementById("featured-film-content"),
         topRated: document.getElementById("film-container"),
@@ -59,16 +52,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             .then(data => {
                 const filmElement = document.createElement("div");
                 filmElement.classList.add(isFeatured ? "featured-film" : "film");
-
-                const localImages = {
-
-                };
-
-
-
-
-
-                const imageUrl = localImages[data.original_title] || data.image_url || "placeholder.jpg";
+                const imageUrl = data.image_url || "placeholder.jpg";
 
                 filmElement.innerHTML = `
                     <img src="${imageUrl}" alt="${data.original_title}">
@@ -89,8 +73,20 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
 
+            if (data.image_url) {
+                try {
+                    const imageResponse = await fetch(data.image_url);
+                    if (!imageResponse.ok) {
+                        throw new Error(`Erreur HTTP sur l'image: ${imageResponse.status}`);
+                    }
+                } catch (error) {
+                    data.image_url = null;
+                    console.error("Erreur lors de la récupération de l'image:", error);
+                }
+            }
+
             modalDetails.innerHTML = `
-                <img src="${data.image_url || 'placeholder.jpg'}" alt="${data.original_title}">
+                <img src="${data.image_url || 'images/placeholder.png'}" alt="${data.original_title || 'Titre inconnu'}">
                 <h3>${data.original_title || 'Titre inconnu'}</h3>
                 <p><strong>Genre :</strong> ${data.genres?.join(", ") || "Non disponible"}</p>
                 <p><strong>Date de sortie :</strong> ${data.date_published || "Non disponible"}</p>
@@ -118,21 +114,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
-    document.querySelectorAll(".see-more-btn").forEach(button => {
-        button.addEventListener("click", function() {
-            const category = this.dataset.category;
-            categories[category]?.forEach(id => fetchAndDisplayFilm(id, containers[category]));
-        });
-    });
-
-    fetchAndDisplayFilm(featuredFilmId, containers.featured, true);
-    categories.topRated.forEach(id => fetchAndDisplayFilm(id, containers.topRated));
-});
-
-
-
-document.addEventListener("DOMContentLoaded", async function () {
-    const baseURL = "http://localhost:8000/api/v1/titles/";
     const categories = {
         topRated: { container: document.getElementById("film-container"), genre: "", limit: 6, expanded: false, films: [] },
         animation: { container: document.getElementById("category-1-content"), genre: "animation", limit: 6, expanded: false, films: [] },
@@ -147,7 +128,25 @@ document.addEventListener("DOMContentLoaded", async function () {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
-            return data.results || [];
+            const films = data.results || [];
+
+            for (let film of films) {
+                if (film.image_url && film.image_url !== 'undefined') {
+                    try {
+                        const imageResponse = await fetch(film.image_url);
+                        if (!imageResponse.ok) {
+                            throw new Error(`Erreur HTTP sur l'image: ${imageResponse.status}`);
+                        }
+                    } catch (error) {
+                        film.image_url = null;
+                        console.error(`Erreur lors de la récupération de l'image pour le film "${film.title}":`, error);
+                    }
+                } else {
+                    film.image_url = null;
+                }
+            }
+
+            return films;
         } catch (error) {
             console.error("Erreur lors de la récupération des films:", error);
             return [];
@@ -156,13 +155,12 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     function displayFilms(films, container) {
         if (!container) return;
-        container.innerHTML = ""; // ✅ Supprime les films existants pour éviter la duplication
-
+        container.innerHTML = ""; // Supprime les films existants pour éviter la duplication
         films.forEach(film => {
             const filmElement = document.createElement("div");
             filmElement.classList.add("film");
             filmElement.innerHTML = `
-                <img src="${film.image_url || 'placeholder.jpg'}" alt="${film.title}">
+                <img src="${film.image_url || 'images/placeholder.png'}" alt="${film.title}">
                 <div class="film-info">
                     <h2>${film.title}</h2>
                     <p>${film.description || "Description non disponible"}</p>
@@ -189,9 +187,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         category.expanded = !category.expanded;
         category.limit = category.expanded ? 12 : 6;
-        button.innerHTML = category.expanded ? "Réduire " : "Voir plus ";
+        button.innerHTML = category.expanded ? "Réduire" : "Voir plus";
 
-        await loadCategory(categoryKey); //  Recharge sans dupliquer
+        await loadCategory(categoryKey); // Recharge les films sans dupliquer
     }
 
     // Charger les films initiaux
@@ -204,20 +202,14 @@ document.addEventListener("DOMContentLoaded", async function () {
 
         const button = document.createElement("button");
         button.id = `see-more-${categoryKey}`;
-        button.innerHTML = "Voir plus ";
+        button.innerHTML = "Voir plus";
         button.classList.add("see-more-btn");
         category.container.parentElement.appendChild(button);
         button.addEventListener("click", () => toggleMore(categoryKey));
     });
-});
 
-document.addEventListener("DOMContentLoaded", async function () {
-    const baseURL = "http://localhost:8000/api/v1/titles/";
     const categorySelect = document.getElementById("category-select");
     const selectedCategoryContainer = document.getElementById("selected-category-container");
-    const modal = document.getElementById("modal");
-    const modalDetails = document.getElementById("modal-details");
-    const closeModalBtn = document.querySelector(".close-btn");
 
     async function fetchCategories() {
         try {
@@ -246,75 +238,18 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
-    async function displaySelectedCategory(categoryName) {
-        if (categoryName === "all") {
+    categorySelect.addEventListener("change", async function (event) {
+        const selectedCategory = event.target.value;
+        if (selectedCategory === "all") {
             selectedCategoryContainer.innerHTML = "<p>Veuillez choisir une catégorie</p>";
             return;
         }
-
         try {
-            const response = await fetch(`${baseURL}?genre=${categoryName}&sort_by=-imdb_score&page_size=6`);
-            const data = await response.json();
-
-            if (data.results.length === 0) {
-                selectedCategoryContainer.innerHTML = `<p>Aucun film trouvé pour ${categoryName}</p>`;
-                return;
-            }
-
-            selectedCategoryContainer.innerHTML = `
-                <h3>Films de la catégorie : ${categoryName}</h3>
-                <div class="movies-list">
-                    ${data.results.map(movie => `
-                        <div class="movie-card" data-id="${movie.id}">
-                            <img src="${movie.image_url || 'placeholder.jpg'}" alt="${movie.title}" />
-                            <h4>${movie.title}</h4>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-
-            // Ajouter un écouteur d'événements pour afficher les détails du film
-            document.querySelectorAll(".movie-card").forEach(card => {
-                card.addEventListener("click", () => displayModal(card.dataset.id));
-            });
-
+            const films = await fetchFilms(selectedCategory, 6); // Récupère les films selon la catégorie sélectionnée
+            displayFilms(films, selectedCategoryContainer); // Affiche les films dans le conteneur
         } catch (error) {
-            console.error("Erreur lors de l'affichage des films de la catégorie:", error);
+            console.error("Erreur lors de la récupération des films:", error);
         }
-    }
-
-    async function displayModal(filmId) {
-        try {
-            const response = await fetch(baseURL + filmId);
-            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-            const data = await response.json();
-
-            modalDetails.innerHTML = `
-                <img src="${data.image_url || 'placeholder.jpg'}" alt="${data.title}">
-                <h3>${data.title}</h3>
-                <p><strong>Genre :</strong> ${data.genres?.join(", ") || "Non disponible"}</p>
-                <p><strong>Date de sortie :</strong> ${data.date_published || "Non disponible"}</p>
-                <p><strong>Score IMDB :</strong> ${data.imdb_score || "Non noté"}</p>
-                <p><strong>Réalisateur :</strong> ${data.directors?.join(", ") || "Non disponible"}</p>
-                <p><strong>Acteurs :</strong> ${data.actors?.join(", ") || "Non disponible"}</p>
-                <p><strong>Durée :</strong> ${data.duration ? `${data.duration} minutes` : "Non disponible"}</p>
-                <p><strong>Pays d'origine :</strong> ${data.countries?.join(", ") || "Non disponible"}</p>
-                <p><strong>Recettes :</strong> ${data.worldwide_gross_income ? `${data.worldwide_gross_income} ${data.budget_currency || ''}` : "Non disponible"}</p>
-                <p><strong>Résumé :</strong> ${data.long_description || data.description || "Résumé non disponible"}</p>
-            `;
-            modal.style.display = "block";
-        } catch (error) {
-            console.error("Erreur lors de l'affichage du film:", error);
-        }
-    }
-
-    closeModalBtn.onclick = () => (modal.style.display = "none");
-    window.onclick = event => { if (event.target === modal) modal.style.display = "none"; };
-
-    categorySelect.addEventListener("change", (event) => {
-        const selectedCategory = event.target.value;
-        displaySelectedCategory(selectedCategory);
     });
-
-    await fetchCategories();
+    fetchCategories();
 });
