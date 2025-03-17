@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function fetchBestFilm() {
         try {
-            // 1. Récupérer le meilleur film (trié par score IMDB)
             const response = await fetch(baseURL + "?sort_by=-imdb_score&page_size=1");
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
@@ -13,14 +12,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 return;
             }
             const bestFilm = data.results[0];
-            // 2. Récupérer les détails complets du meilleur film
             const detailsResponse = await fetch(baseURL + bestFilm.id);
             if (!detailsResponse.ok) throw new Error(`Erreur HTTP: ${detailsResponse.status}`);
             const filmDetails = await detailsResponse.json();
-            // 3. Ajouter le film dans la section "Meilleur film"
+
             featuredContainer.innerHTML = `
                 <div class="featured-film">
-                    <img src="${filmDetails.image_url || 'placeholder.jpg'}" alt="${filmDetails.title}">
+                    <img src="${filmDetails.image_url || 'placeholder.jpg'}" alt="${filmDetails.title}" onerror="handleImageError(this)">
                     <div class="film-info">
                         <h2>${filmDetails.title}</h2>
                         <p>${filmDetails.long_description || filmDetails.description || "Résumé non disponible"}</p>
@@ -55,7 +53,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                 const imageUrl = data.image_url || "placeholder.jpg";
 
                 filmElement.innerHTML = `
-                    <img src="${imageUrl}" alt="${data.original_title}">
+                    <img src="${imageUrl}" alt="${data.original_title}" onerror="handleImageError(this)">
                     <div class="film-info">
                         <h2>${data.original_title}</h2>
                         <p>${data.description}</p>
@@ -86,7 +84,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             modalDetails.innerHTML = `
-                <img src="${data.image_url || 'images/placeholder.png'}" alt="${data.original_title || 'Titre inconnu'}">
+                <img src="${data.image_url || 'images/placeholder.png'}" alt="${data.original_title || 'Titre inconnu'}" onerror="handleImageError(this)">
                 <h3>${data.original_title || 'Titre inconnu'}</h3>
                 <p><strong>Genre :</strong> ${data.genres?.join(", ") || "Non disponible"}</p>
                 <p><strong>Date de sortie :</strong> ${data.date_published || "Non disponible"}</p>
@@ -160,7 +158,7 @@ document.addEventListener("DOMContentLoaded", async function () {
             const filmElement = document.createElement("div");
             filmElement.classList.add("film");
             filmElement.innerHTML = `
-                <img src="${film.image_url || 'images/placeholder.png'}" alt="${film.title}">
+                <img src="${film.image_url || 'images/placeholder.png'}" alt="${film.title}" onerror="handleImageError(this)">
                 <div class="film-info">
                     <h2>${film.title}</h2>
                     <p>${film.description || "Description non disponible"}</p>
@@ -253,3 +251,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
     fetchCategories();
 });
+
+function handleImageError(image) {
+    // Remplacez l'image par une image de remplacement
+    image.onerror = null; // Évite les boucles infinies
+    image.src = 'front-end/images/clac de cinéma.webp'; // Chemin vers votre image de remplacement
+}
