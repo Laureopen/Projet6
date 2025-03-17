@@ -173,49 +173,65 @@ header {
 
 /* Centrer la section "Films par Catégorie" */
 #categories {
-    display: flex;
+    display:flex;
     flex-direction: column;
     align-items: center;
-    margin-top: 20px; /* Ajustez l'espacement au-dessus de la section */
-    padding: 10px;
-    border: 1px solid #ccc; /* Optionnel : ajoute une bordure pour la visibilité */
-    border-radius: 5px; /* Optionnel : ajoute des coins arrondis */
-    background-color: #f9f9f9; /* Optionnel : ajoute un fond léger */
+    grid-template-columns: repeat(3, 1fr); /* 3 films par ligne */
+    justify-content: center;
 }
 
-#categories h2 {
-    margin-bottom: 10px;
+/* Conteneur films par categories */
+.film-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 films par ligne */
+    gap: 20px; /* Espacement entre les films */
+    justify-content: center;
+    max-width: 1200px; /* Ajustez selon vos besoins */
+    margin: auto;
 }
 
-#categories label, #categories select {
-    margin-bottom: 10px;
+/* Style pour chaque élément de film */
+.film-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    overflow: hidden;
+    transition: transform 0.2s; /* Ajoute une transition pour l'effet de survol */
 }
 
-#selected-category-container {
+
+.film-item img {
     width: 100%;
-    max-width: 800px; /* Limite la largeur pour un meilleur affichage */
+    height: auto;
+    display: block;
 }
 
+.film-item .film-info {
+    padding: 10px;
+}
 
+.film-item .details-btn {
+    display: inline-block;
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
 
+/* Responsive Design */
+@media only screen and (max-width: 800px) {
+    .film-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+@media only screen and (max-width: 500px) {
+    .film-grid {
+        grid-template-columns: 1fr;
+    }
+}
