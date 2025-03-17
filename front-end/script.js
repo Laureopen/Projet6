@@ -257,3 +257,8 @@ function handleImageError(image) {
     image.onerror = null; // Évite les boucles infinies
     image.src = 'front-end/images/clac de cinéma.webp'; // Chemin vers votre image de remplacement
 }
+
+
+
+
+
