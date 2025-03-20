@@ -139,24 +139,6 @@ header {
     height: 247 ;
 }
 
-/* Responsive */
-@media only screen and (max-width:800px) {
-    .film-container {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media only screen and (max-width: 500px) {
-    .film-container {
-        grid-template-columns: 1fr;
-    }
-    header {
-        flex-direction: column;
-    }
-    .featured-film {
-        flex-direction: column;
-    }
-}
 
 .see-more-btn {
     display: block;
@@ -190,6 +172,7 @@ header {
     margin: auto;
 }
 
+
 /* Style pour chaque élément de film */
 .film-item {
     background-color: #fff;
@@ -200,7 +183,6 @@ header {
     overflow: hidden;
     transition: transform 0.2s; /* Ajoute une transition pour l'effet de survol */
 }
-
 
 .film-item img {
     width: 100%;
@@ -223,15 +205,39 @@ header {
     font-size: 14px;
 }
 
-/* Responsive Design */
+
+
+
+/* Responsive Design pour tous les films en version tablette : 4 films affichés, 2 cachés */
 @media only screen and (max-width: 800px) {
-    .film-grid {
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    .film:nth-child(n+5) { /* Cache les films à partir du 5e */
+        display: none;
+    }
+    .film-container {
+        grid-template-columns: repeat(2, 1fr); /* 2 films par ligne */
     }
 }
 
+/* Responsive Design pour tous les films en version mobile : 2 films affichés, 4 cachés */
 @media only screen and (max-width: 500px) {
+    .film:nth-child(n+3) { /* Cache les films à partir du 3e */
+        display: none;
+    }
+    .film-container {
+        grid-template-columns: repeat(1, 1fr); /* 1 film par ligne */
+    }
+}
+
+
+/* Responsive Design catégories */
+@media screen and (max-width: 800px) {
     .film-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr); /* 2 films par ligne sur tablette */
+    }
+}
+
+@media screen and (max-width: 500px) {
+    .film-grid {
+        grid-template-columns: repeat(1, 1fr); /* 1 film par ligne sur mobile */
     }
 }
