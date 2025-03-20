@@ -186,7 +186,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         category.expanded = !category.expanded;
         category.limit = category.expanded ? 12 : 6;
         button.innerHTML = category.expanded ? "Réduire" : "Voir plus";
-
         await loadCategory(categoryKey); // Recharge les films sans dupliquer
     }
 
@@ -255,10 +254,5 @@ document.addEventListener("DOMContentLoaded", async function () {
 function handleImageError(image) {
     // Remplacez l'image par une image de remplacement
     image.onerror = null; // Évite les boucles infinies
-    image.src = 'front-end/images/clac de cinéma.webp'; // Chemin vers votre image de remplacement
+    image.src = 'front-end/images/clac de cinéma.jpg'; // Chemin vers votre image de remplacement
 }
-
-
-
-
-
