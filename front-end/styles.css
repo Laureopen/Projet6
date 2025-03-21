@@ -208,25 +208,87 @@ header {
 
 
 
-/* Responsive Design pour tous les films en version tablette : 4 films affichés, 2 cachés */
+
+/* Style de base pour les conteneurs de films */
+.film-container {
+    display: grid;
+    gap: 20px;
+    justify-content: center;
+}
+
+
+
+/* Version ordinateur : affiche 6 films */
+.film-container {
+    grid-template-columns: repeat(3, 1fr); /* 3 films par ligne */
+}
+
+/* Version tablette : affiche 4 films, cache 2 films */
 @media only screen and (max-width: 800px) {
-    .film:nth-child(n+5) { /* Cache les films à partir du 5e */
-        display: none;
-    }
     .film-container {
         grid-template-columns: repeat(2, 1fr); /* 2 films par ligne */
     }
-}
-
-/* Responsive Design pour tous les films en version mobile : 2 films affichés, 4 cachés */
-@media only screen and (max-width: 500px) {
-    .film:nth-child(n+3) { /* Cache les films à partir du 3e */
+    .film-container .film:nth-child(n+5) {
         display: none;
     }
+}
+
+/* Version mobile : affiche 2 films, cache 4 films */
+@media only screen and (max-width: 500px) {
     .film-container {
-        grid-template-columns: repeat(1, 1fr); /* 1 film par ligne */
+        grid-template-columns: 1fr; /* 1 film par ligne */
+    }
+    .film-container .film:nth-child(n+3) {
+        display: none;
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* Responsive Design catégories */
@@ -240,4 +302,5 @@ header {
     .film-grid {
         grid-template-columns: repeat(1, 1fr); /* 1 film par ligne sur mobile */
     }
+}
 }
