@@ -4,15 +4,13 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     async function fetchBestFilm() {
         try {
-            const response = await fetch(baseURL + "?sort_by=-imdb_score&page_size=1");
+            const response = await fetch(`${baseURL}?sort_by=-imdb_score&page_size=1`);
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
-            if (data.results.length === 0) {
-                console.error("Aucun film trouvé !");
-                return;
-            }
+            if (data.results.length === 0) return;
+
             const bestFilm = data.results[0];
-            const detailsResponse = await fetch(baseURL + bestFilm.id);
+            const detailsResponse = await fetch(`${baseURL}${bestFilm.id}`);
             if (!detailsResponse.ok) throw new Error(`Erreur HTTP: ${detailsResponse.status}`);
             const filmDetails = await detailsResponse.json();
 
@@ -33,89 +31,10 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     await fetchBestFilm();
 
-    const containers = {
-        featured: document.getElementById("featured-film-content"),
-        topRated: document.getElementById("film-container"),
-        category1: document.getElementById("category-1-content"),
-        category2: document.getElementById("category-2-content")
-    };
-
-    const modal = document.getElementById("modal");
-    const modalDetails = document.getElementById("modal-details");
-    const closeModalBtn = document.getElementsByClassName("close-btn")[0];
-
-    function fetchAndDisplayFilm(filmId, container, isFeatured = false) {
-        fetch(baseURL + filmId)
-            .then(response => response.json())
-            .then(data => {
-                const filmElement = document.createElement("div");
-                filmElement.classList.add(isFeatured ? "featured-film" : "film");
-                const imageUrl = data.image_url || "placeholder.jpg";
-
-                filmElement.innerHTML = `
-                    <img src="${imageUrl}" alt="${data.original_title}" onerror="handleImageError(this)">
-                    <div class="film-info">
-                        <h2>${data.original_title}</h2>
-                        <p>${data.description}</p>
-                        <button class="details-btn" data-id="${data.id}">Détails</button>
-                    </div>
-                `;
-                container.appendChild(filmElement);
-            })
-            .catch(error => console.error("Erreur lors de la récupération des données:", error));
-    }
-
-    async function displayModal(filmId) {
-        try {
-            const response = await fetch(baseURL + filmId);
-            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
-            const data = await response.json();
-
-            if (data.image_url) {
-                try {
-                    const imageResponse = await fetch(data.image_url);
-                    if (!imageResponse.ok) {
-                        throw new Error(`Erreur HTTP sur l'image: ${imageResponse.status}`);
-                    }
-                } catch (error) {
-                    data.image_url = null;
-                    console.error("Erreur lors de la récupération de l'image:", error);
-                }
-            }
-
-            modalDetails.innerHTML = `
-                <img src="${data.image_url || 'images/placeholder.png'}" alt="${data.original_title || 'Titre inconnu'}" onerror="handleImageError(this)">
-                <h3>${data.original_title || 'Titre inconnu'}</h3>
-                <p><strong>Genre :</strong> ${data.genres?.join(", ") || "Non disponible"}</p>
-                <p><strong>Date de sortie :</strong> ${data.date_published || "Non disponible"}</p>
-                <p><strong>Classification :</strong> ${data.rated || "Non classé"}</p>
-                <p><strong>Score IMDB :</strong> ${data.imdb_score || "Non noté"}</p>
-                <p><strong>Réalisateur :</strong> ${data.directors?.join(", ") || "Non disponible"}</p>
-                <p><strong>Acteurs :</strong> ${data.actors?.join(", ") || "Non disponible"}</p>
-                <p><strong>Durée :</strong> ${data.duration ? `${data.duration} minutes` : "Non disponible"}</p>
-                <p><strong>Pays d'origine :</strong> ${data.countries?.join(", ") || "Non disponible"}</p>
-                <p><strong>Recettes :</strong> ${data.worldwide_gross_income ? `${data.worldwide_gross_income} ${data.budget_currency || ''}` : "Non disponible"}</p>
-                <p><strong>Résumé :</strong> ${data.long_description || data.description || "Résumé non disponible"}</p>
-            `;
-            modal.style.display = "block";
-        } catch (error) {
-            console.error("Erreur lors de l'affichage du film:", error);
-        }
-    }
-
-    closeModalBtn.onclick = () => (modal.style.display = "none");
-    window.onclick = event => { if (event.target === modal) modal.style.display = "none"; };
-
-    document.addEventListener("click", event => {
-        if (event.target.classList.contains("details-btn")) {
-            displayModal(event.target.dataset.id);
-        }
-    });
-
     const categories = {
-        topRated: { container: document.getElementById("film-container"), genre: "", limit: 6, expanded: false, films: [] },
-        animation: { container: document.getElementById("category-1-content"), genre: "animation", limit: 6, expanded: false, films: [] },
-        western: { container: document.getElementById("category-2-content"), genre: "western", limit: 6, expanded: false, films: [] }
+        topRated: { container: document.getElementById("film-container"), genre: "", limit: 12, expanded: false },
+        animation: { container: document.getElementById("category-1-content"), genre: "animation", limit: 6, expanded: false },
+        western: { container: document.getElementById("category-2-content"), genre: "western", limit: 6, expanded: false }
     };
 
     async function fetchFilms(genre, limit) {
@@ -126,37 +45,21 @@ document.addEventListener("DOMContentLoaded", async function () {
             const response = await fetch(url);
             if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
-            const films = data.results || [];
-
-            for (let film of films) {
-                if (film.image_url && film.image_url !== 'undefined') {
-                    try {
-                        const imageResponse = await fetch(film.image_url);
-                        if (!imageResponse.ok) {
-                            throw new Error(`Erreur HTTP sur l'image: ${imageResponse.status}`);
-                        }
-                    } catch (error) {
-                        film.image_url = null;
-                        console.error(`Erreur lors de la récupération de l'image pour le film "${film.title}":`, error);
-                    }
-                } else {
-                    film.image_url = null;
-                }
-            }
-
-            return films;
+            return data.results || [];
         } catch (error) {
             console.error("Erreur lors de la récupération des films:", error);
             return [];
         }
     }
 
-    function displayFilms(films, container) {
+    function displayFilms(films, container, categoryKey) {
         if (!container) return;
-        container.innerHTML = ""; // Supprime les films existants pour éviter la duplication
-        films.forEach(film => {
+        container.innerHTML = "";
+
+        films.forEach((film, index) => {
             const filmElement = document.createElement("div");
             filmElement.classList.add("film");
+            filmElement.style.display = index < getVisibleCount() ? "block" : "none"; // Films cachés si besoin
             filmElement.innerHTML = `
                 <img src="${film.image_url || 'images/placeholder.png'}" alt="${film.title}" onerror="handleImageError(this)">
                 <div class="film-info">
@@ -167,92 +70,109 @@ document.addEventListener("DOMContentLoaded", async function () {
             `;
             container.appendChild(filmElement);
         });
+
+        createToggleButton(container, categoryKey);
+    }
+
+    function createToggleButton(container, categoryKey) {
+        let button = document.getElementById(`see-more-${categoryKey}`);
+        if (!button) {
+            button = document.createElement("button");
+            button.id = `see-more-${categoryKey}`;
+            button.classList.add("see-more-btn");
+            container.parentElement.appendChild(button);
+            button.addEventListener("click", () => toggleMore(categoryKey));
+        }
+        updateButtonText(categoryKey, button);
+    }
+
+    function updateButtonText(categoryKey, button) {
+        const category = categories[categoryKey];
+        button.innerHTML = category.expanded ? "Réduire" : "Voir plus";
     }
 
     async function loadCategory(categoryKey) {
         const category = categories[categoryKey];
         if (!category.container) return;
 
-        category.films = await fetchFilms(category.genre, category.limit);
-        displayFilms(category.films, category.container);
+        const films = await fetchFilms(category.genre, category.limit);
+        displayFilms(films, category.container, categoryKey);
     }
 
-    async function toggleMore(categoryKey) {
+    function getVisibleCount() {
+        if (window.innerWidth <= 500) return 2; // Mobile : 2 films visibles
+        if (window.innerWidth <= 800) return 4; // Tablette : 4 films visibles
+        return 6; // PC : 6 films visibles par défaut
+    }
+
+    function toggleMore(categoryKey) {
         const category = categories[categoryKey];
-        const button = document.getElementById(`see-more-${categoryKey}`);
-
-        if (!category.container || !button) return;
-
+        const films = category.container.querySelectorAll(".film");
         category.expanded = !category.expanded;
-        category.limit = category.expanded ? 12 : 6;
-        button.innerHTML = category.expanded ? "Réduire" : "Voir plus";
-        await loadCategory(categoryKey); // Recharge les films sans dupliquer
+        const visibleCount = getVisibleCount();
+
+        films.forEach((film, index) => {
+            film.style.display = index < visibleCount || category.expanded ? "block" : "none";
+        });
+
+        updateButtonText(categoryKey, document.getElementById(`see-more-${categoryKey}`));
     }
 
-    // Charger les films initiaux
+    // Chargement des films au démarrage
     await Promise.all(Object.keys(categories).map(loadCategory));
 
-    // Ajouter les boutons "Voir plus"
-    Object.keys(categories).forEach(categoryKey => {
-        const category = categories[categoryKey];
-        if (!category.container) return;
+    window.addEventListener("resize", () => {
+        Object.keys(categories).forEach(categoryKey => {
+            const category = categories[categoryKey];
+            if (!category.container) return;
+            const films = category.container.querySelectorAll(".film");
+            const visibleCount = getVisibleCount();
 
-        const button = document.createElement("button");
-        button.id = `see-more-${categoryKey}`;
-        button.innerHTML = "Voir plus";
-        button.classList.add("see-more-btn");
-        category.container.parentElement.appendChild(button);
-        button.addEventListener("click", () => toggleMore(categoryKey));
+            films.forEach((film, index) => {
+                film.style.display = index < visibleCount || category.expanded ? "block" : "none";
+            });
+        });
     });
 
-    const categorySelect = document.getElementById("category-select");
-    const selectedCategoryContainer = document.getElementById("selected-category-container");
+    document.addEventListener("click", event => {
+        if (event.target.classList.contains("details-btn")) {
+            displayModal(event.target.dataset.id);
+        }
+    });
 
-    async function fetchCategories() {
+    async function displayModal(filmId) {
         try {
-            const response = await fetch(baseURL + "?sort_by=-imdb_score&page_size=50");
+            const response = await fetch(`${baseURL}${filmId}`);
+            if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
             const data = await response.json();
 
-            let categories = new Set();
-            data.results.forEach(movie => {
-                movie.genres.forEach(genre => categories.add(genre));
-            });
-
-            populateCategoryDropdown(Array.from(categories));
+            const modal = document.getElementById("modal");
+            const modalDetails = document.getElementById("modal-details");
+            modalDetails.innerHTML = `
+                <img src="${data.image_url || 'images/placeholder.png'}" alt="${data.original_title || 'Titre inconnu'}" onerror="handleImageError(this)">
+                <h3>${data.original_title || 'Titre inconnu'}</h3>
+                <p><strong>Genre :</strong> ${data.genres?.join(", ") || "Non disponible"}</p>
+                <p><strong>Date de sortie :</strong> ${data.date_published || "Non disponible"}</p>
+                <p><strong>Score IMDB :</strong> ${data.imdb_score || "Non noté"}</p>
+                <p><strong>Résumé :</strong> ${data.long_description || data.description || "Résumé non disponible"}</p>
+            `;
+            modal.style.display = "block";
         } catch (error) {
-            console.error("Erreur lors de la récupération des catégories:", error);
+            console.error("Erreur lors de l'affichage du film:", error);
         }
     }
 
-    function populateCategoryDropdown(categories) {
-        categorySelect.innerHTML = '<option value="all">Toutes les catégories</option>';
-
-        categories.forEach(category => {
-            let option = document.createElement("option");
-            option.value = category.toLowerCase();
-            option.textContent = category;
-            categorySelect.appendChild(option);
-        });
-    }
-
-    categorySelect.addEventListener("change", async function (event) {
-        const selectedCategory = event.target.value;
-        if (selectedCategory === "all") {
-            selectedCategoryContainer.innerHTML = "<p>Veuillez choisir une catégorie</p>";
-            return;
+    document.getElementsByClassName("close-btn")[0].onclick = () => {
+        document.getElementById("modal").style.display = "none";
+    };
+    window.onclick = event => {
+        if (event.target === document.getElementById("modal")) {
+            document.getElementById("modal").style.display = "none";
         }
-        try {
-            const films = await fetchFilms(selectedCategory, 6); // Récupère les films selon la catégorie sélectionnée
-            displayFilms(films, selectedCategoryContainer); // Affiche les films dans le conteneur
-        } catch (error) {
-            console.error("Erreur lors de la récupération des films:", error);
-        }
-    });
-    fetchCategories();
+    };
 });
 
 function handleImageError(image) {
-    // Remplacez l'image par une image de remplacement
-    image.onerror = null; // Évite les boucles infinies
-    image.src = 'front-end/images/clac de cinéma.jpg'; // Chemin vers votre image de remplacement
+    image.onerror = null;
+    image.src = 'front-end/images/clac de cinéma.jpg';
 }
