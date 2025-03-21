@@ -7,59 +7,54 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <header>
+        <img src="images/logo.png" alt="JustStreamIt Logo" class="logo">
+        <h1 class="header-text">Vidéos à la demande</h1>
+    </header>
 
-<header>
-    <img src="images/logo.png" alt="JustStreamIt Logo" class="logo">
-    <h1 class="header-text">Vidéos à la demande</h1>
-</header>
+    <main>
+        <!-- Meilleur film -->
+        <section id="featured-film" aria-labelledby="featured-film-title">
+            <h1 id="featured-film-title">Meilleur film</h1>
+            <div id="featured-film-content"></div>
+        </section>
 
-<main>
-    <!-- Meilleur film -->
-    <section id="featured-film" aria-labelledby="featured-film-title">
-        <h1 id="featured-film-title">Meilleur film</h1>
-        <div id="featured-film-content"></div>
-    </section>
+        <!-- Films les mieux notés -->
+        <section aria-labelledby="top-rated-films-title">
+            <h2 id="top-rated-films-title">Films les mieux notés</h2>
+            <div id="film-container" class="film-container"></div>
+        </section>
 
-    <!-- Films les mieux notés -->
-    <section aria-labelledby="top-rated-films-title">
-        <h2 id="top-rated-films-title">Films les mieux notés</h2>
-        <div id="film-container" class="film-container"></div>
+        <!-- Catégorie 1 -->
+        <section aria-labelledby="category-1-title">
+            <h2 id="category-1-title">Animation</h2>
+            <div id="category-1-content" class="film-container"></div>
+        </section>
 
-    </section>
+        <!-- Catégorie 2 -->
+        <section aria-labelledby="category-2-title">
+            <h2 id="category-2-title">Westerns</h2>
+            <div id="category-2-content" class="film-container"></div>
+        </section>
 
-    <!-- Catégorie 1 -->
-    <section aria-labelledby="category-1-title">
-        <h2 id="category-1-title">Animation</h2>
-        <div id="category-1-content" class="film-container"></div>
-    </section>
+        <section id="categories">
+            <h2>Films par Catégorie</h2>
+            <label for="category-select">Autres :</label>
+            <select id="category-select">
+                <option value="">-- Sélectionner une catégorie --</option>
+            </select>
+            <div id="selected-category-container" class="film-grid"></div>
+        </section>
+    </main>
 
-
-    <!-- Catégorie 2 -->
-    <section aria-labelledby="category-2-title">
-        <h2 id="category-2-title">Westerns</h2>
-        <div id="category-2-content" class="film-container"></div>
-
-    </section>
-
-    <section id="categories">
-    <h2>Films par Catégorie</h2>
-    <label for="category-select">Autres :</label>
-    <select id="category-select">
-        <option value="">-- Sélectionner une catégorie --</option>
-    </select>
-    <div id="selected-category-container" class="film-grid"></div>
-</section>
-</main>
-
-<!-- Modal pour afficher les détails du film -->
-<div id="modal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn">&times;</span>
-        <div id="modal-details"></div>
+    <!-- Modal pour afficher les détails du film -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <div id="modal-details"></div>
+        </div>
     </div>
-</div>
 
-<script src="./script.js" defer></script>
-
+    <script src="./script.js" defer></script>
 </body>
 </html>
