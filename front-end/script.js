@@ -114,13 +114,14 @@ document.addEventListener("DOMContentLoaded", async function () {
             `;
             container.appendChild(filmElement);
         });
-
-        createToggleButton(container, categoryKey);
+		if (window.innerWidth <= 800) {
+			createToggleButton(container, categoryKey); // crée le bouton "voir +" si pas version mobile ou tablette
+		}
     }
 
     function createToggleButton(container, categoryKey) {
         let button = document.getElementById(`see-more-${categoryKey}`);
-        if (!button) {
+        if (!button && (categoryKey != null)) {
             button = document.createElement("button");
             button.id = `see-more-${categoryKey}`;
             button.classList.add("see-more-btn");
@@ -167,18 +168,35 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Chargement des films au démarrage
     await Promise.all(Object.keys(categories).map(loadCategory));
 
-    window.addEventListener("resize", () => {
-        Object.keys(categories).forEach(categoryKey => {
-            const category = categories[categoryKey];
-            if (!category.container) return;
-            const films = category.container.querySelectorAll(".film");
-            const visibleCount = getVisibleCount();
+	window.addEventListener("resize", () => {
+		// Vérifie si la largeur de la fenêtre est inférieure ou égale à 800px
+		const isMobileOrTablet = window.innerWidth <= 800;
 
-            films.forEach((film, index) => {
-                film.style.display = index < visibleCount || category.expanded ? "block" : "none";
-            });
-        });
-    });
+		Object.keys(categories).forEach(categoryKey => {
+			const category = categories[categoryKey];
+			if (!category.container) return;
+
+			const films = category.container.querySelectorAll(".film");
+			const visibleCount = getVisibleCount();
+
+			// Ajuste la visibilité des films en fonction de la taille de la fenêtre
+			films.forEach((film, index) => {
+				film.style.display = index < visibleCount || category.expanded ? "block" : "none";
+			});
+
+			if (!isMobileOrTablet) {
+				// Masque tous les boutons "Voir plus" pour les écrans mobiles ou tablettes
+				const button = document.getElementById(`see-more-${categoryKey}`);
+				if (button) button.style.display = "none";
+			} else {
+				// Affiche les boutons "Voir plus" pour les écrans plus grands
+				const button = document.getElementById(`see-more-${categoryKey}`);
+				if (button) button.style.display = "block";
+			}
+		});
+	});
+
+
 
     document.addEventListener("click", event => {
         if (event.target.classList.contains("details-btn")) {
