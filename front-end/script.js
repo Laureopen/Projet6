@@ -1,6 +1,8 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const baseURL = "http://localhost:8000/api/v1/titles/";
     const featuredContainer = document.getElementById("featured-film-content");
+    const categorySelect = document.getElementById("category-select");
+    const selectedCategoryContainer = document.getElementById("selected-category-container");
 
     async function fetchBestFilm() {
         try {
@@ -29,10 +31,52 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     }
 
+    async function fetchCategories() {
+        try {
+            const response = await fetch(baseURL + "?sort_by=-imdb_score&page_size=50");
+            const data = await response.json();
+
+            let categories = new Set();
+            data.results.forEach(movie => {
+                movie.genres.forEach(genre => categories.add(genre));
+            });
+
+            populateCategoryDropdown(Array.from(categories));
+        } catch (error) {
+            console.error("Erreur lors de la récupération des catégories:", error);
+        }
+    }
+
+    function populateCategoryDropdown(categories) {
+        categorySelect.innerHTML = '<option value="all">Toutes les catégories</option>';
+
+        categories.forEach(category => {
+            let option = document.createElement("option");
+            option.value = category.toLowerCase();
+            option.textContent = category;
+            categorySelect.appendChild(option);
+        });
+    }
+
+    categorySelect.addEventListener("change", async function (event) {
+        const selectedCategory = event.target.value;
+        if (selectedCategory === "all") {
+            selectedCategoryContainer.innerHTML = "<p>Veuillez choisir une catégorie</p>";
+            return;
+        }
+        try {
+            const films = await fetchFilms(selectedCategory, 6); // Récupère les films selon la catégorie sélectionnée
+            displayFilms(films, selectedCategoryContainer); // Affiche les films dans le conteneur
+        } catch (error) {
+            console.error("Erreur lors de la récupération des films:", error);
+        }
+    });
+
     await fetchBestFilm();
+    fetchCategories();
 
     const categories = {
-        topRated: { container: document.getElementById("film-container"), genre: "", limit: 12, expanded: false },
+        topRated: { container: document.getElementById("film-container"), genre: "", limit: 6, expanded: false },
         animation: { container: document.getElementById("category-1-content"), genre: "animation", limit: 6, expanded: false },
         western: { container: document.getElementById("category-2-content"), genre: "western", limit: 6, expanded: false }
     };
@@ -105,6 +149,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         return 6; // PC : 6 films visibles par défaut
     }
 
+
+
     function toggleMore(categoryKey) {
         const category = categories[categoryKey];
         const films = category.container.querySelectorAll(".film");
@@ -151,9 +197,15 @@ document.addEventListener("DOMContentLoaded", async function () {
             modalDetails.innerHTML = `
                 <img src="${data.image_url || 'images/placeholder.png'}" alt="${data.original_title || 'Titre inconnu'}" onerror="handleImageError(this)">
                 <h3>${data.original_title || 'Titre inconnu'}</h3>
-                <p><strong>Genre :</strong> ${data.genres?.join(", ") || "Non disponible"}</p>
+                 <p><strong>Genre :</strong> ${data.genres?.join(", ") || "Non disponible"}</p>
                 <p><strong>Date de sortie :</strong> ${data.date_published || "Non disponible"}</p>
+                <p><strong>Classification :</strong> ${data.rated || "Non classé"}</p>
                 <p><strong>Score IMDB :</strong> ${data.imdb_score || "Non noté"}</p>
+                <p><strong>Réalisateur :</strong> ${data.directors?.join(", ") || "Non disponible"}</p>
+                <p><strong>Acteurs :</strong> ${data.actors?.join(", ") || "Non disponible"}</p>
+                <p><strong>Durée :</strong> ${data.duration ? `${data.duration} minutes` : "Non disponible"}</p>
+                <p><strong>Pays d'origine :</strong> ${data.countries?.join(", ") || "Non disponible"}</p>
+                <p><strong>Recettes :</strong> ${data.worldwide_gross_income ? `${data.worldwide_gross_income} ${data.budget_currency || ''}` : "Non disponible"}</p>
                 <p><strong>Résumé :</strong> ${data.long_description || data.description || "Résumé non disponible"}</p>
             `;
             modal.style.display = "block";
