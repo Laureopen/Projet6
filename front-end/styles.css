@@ -136,7 +136,7 @@ header {
 /* Dimension de chaque affiches films */
 .film img {
     width: 242px ;
-    height: 247 ;
+    height: 247px ;
 }
 
 
@@ -243,54 +243,6 @@ header {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* Responsive Design catégories */
 @media screen and (max-width: 800px) {
     .film-grid {
@@ -302,5 +254,4 @@ header {
     .film-grid {
         grid-template-columns: repeat(1, 1fr); /* 1 film par ligne sur mobile */
     }
-}
 }
